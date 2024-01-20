@@ -1,6 +1,6 @@
 const { BonusTrailGameCard } = require("../models/bonusTrail.maingame");
 const { CardNameGenerator } = require("../utils/CardNameGenerator");
-const { BonusTrailAdminAmount } = require("../models/bonusTrail.game.admin")
+const { BonusTrailAdminAmount } = require("../models/bonusTrail.game.admin");
 const {
   isTrail,
   isPureSequence,
@@ -12,34 +12,37 @@ const {
   randomNumberGenerator1,
   randomGameIdGenerator,
   randomNumberGenerator2,
-  randomDigitGenerator3 
+  randomDigitGenerator3,
 } = require("../utils/randomNumberGenerators");
 const { shuffle } = require("../utils/shuffle");
 
 const cardID = { cardID: null };
 let deck = [];
-let randomNumber;
-var resultCards = []
-const highCardsGenerator = (cardsRanking, deck) => {
-  while(cardsRanking != 0){
-    resultCards =  [];
-    for (let i = 0; i < 3; i++) {
-      const randomNum = randomDigitGenerator3();
-      const drawcards = deck[randomNum];
-      resultCards.push(drawcards);
-    }
-    console.log("deck", deck.length,resultCards);
+let flag = true;
+var resultCards = [];
 
-    cardsRanking = checkHandsRanking(resultCards);
-    return cardsRanking;
+const highCardsGenerator = (deck) => {
+  // while(cardsRanking != 0){
+  resultCards = [];
+  console.log("resultcards", resultCards);
+  for (let i = 0; i < 3; i++) {
+    const randomNum = randomDigitGenerator3();
+    const drawcards = deck[randomNum];
+    resultCards.push(drawcards);
   }
-}
+  console.log("deck", deck.length, resultCards);
+
+  cardsRanking = checkHandsRanking(resultCards);
+  return cardsRanking;
+  // }
+};
 
 const MainGameIdGenerator = async () => {
   const suits = ["hearts", "diamonds", "clubs", "spades"];
   const ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   try {
     deck = [];
+
     for (const rank of ranks) {
       for (const suit of suits) {
         const card = { rank, suit };
@@ -70,73 +73,85 @@ const MainGameIdGenerator = async () => {
 // gameCardHandler
 
 const gameCardHandler = async (gameCardId) => {
+  flag = true;
+  console.log("flag1",flag);
   var cardsRanking = 5;
   try {
     if (deck.length > 0) {
-     
       const mainGameCard = await BonusTrailGameCard.findById(gameCardId);
 
       if (!mainGameCard) {
         // socket.emit("gamecardError", { msg: "mainGame not Found" });
         console.log({ msg: "mainGame not found" });
       }
+      resultCards = [];
       for (let i = 0; i < 3; i++) {
         const randomNum = randomDigitGenerator3();
         const drawcards = deck[randomNum];
         resultCards.push(drawcards);
       }
-      console.log("deck", deck.length,resultCards);
+      console.log("deck", deck.length, resultCards);
 
       cardsRanking = checkHandsRanking(resultCards);
 
-      let multiplyer={
-        1:10,
-        2:20,
-        3:30,
-        4:40,
-        5:50
-      }
+      let multiplyer = {
+        0:1,
+        1: 2, //pair
+        2: 4, //color
+        3: 6, //sequence
+        4: 20, // pure sequence
+        5: 40, //trail
+      };
+
+      //admin Amount
       const adminAmount = await BonusTrailAdminAmount.find();
-      console.log(adminAmount.amount)
+      console.log("amount", adminAmount[0].amount);
 
-      // if(adminAmount<BaitAmount*multiplyer[5] && cardsRanking == 5){
-      //   highCardsGenerator(cardsRanking,deck)
+      while (flag == true) {
+        if (
+          adminAmount[0].amount <
+          mainGameCard.total * multiplyer[cardsRanking] && cardsRanking!==0
+        ) {
+          const v=highCardsGenerator(deck);
+          console.log("abeeeeeeeeeeeeeee baitada",v);
+        } else if (
+          adminAmount[0].amount >
+          mainGameCard.total * multiplyer[cardsRanking]
+        ) {
+          let cardsName = GenerateCardsName(resultCards);
+          mainGameCard.finalCards = cardsName;
+          // finalCards
+          adminAmount[0].amount -= mainGameCard.total;
+          mainGameCard.winstatus = "You Win";
+          flag = false;
+          console.log("flag2",flag);
+          break;
+        } else {
+          let cardsName = GenerateCardsName(resultCards);
 
-      // }
-      // else if(adminAmount<BaitAmount*multiplyer[4] && cardsRanking == 4){
-      //   highCardsGenerator(cardsRanking,deck)
-      // }
-      // else if(adminAmount<BaitAmount*multiplyer[3] && cardsRanking == 3){
-      //   highCardsGenerator(cardsRanking,deck)
-      // }
-      // else if(adminAmount<BaitAmount*multiplyer[2] && cardsRanking == 2){
-      //   highCardsGenerator(cardsRanking,deck)
-      // }
-      // else if(adminAmount<BaitAmount*multiplyer[1] && cardsRanking == 1){
-      //   highCardsGenerator(cardsRanking,deck)
-      // }else if((adminAmount>BaitAmount*multiplyer[5] && cardsRanking == 5) || (adminAmount>BaitAmount*multiplyer[4] && cardsRanking == 4) || (adminAmount<BaitAmount*multiplyer[3] && cardsRanking == 3) || (adminAmount<BaitAmount*multiplyer[2] && cardsRanking == 2) || (adminAmount<BaitAmount*multiplyer[1] && cardsRanking == 1) ){
-      //   console.log("winner");
-      // }else{
-      //   highCardsGenerator(cardsRanking,deck)
-      // }
-      if (adminAmount < BaitAmount * multiplyer[cardsRanking]) {
-        highCardsGenerator(cardsRanking, deck);
-      } 
-      
-     
-      
-    
-      // const side2cardsRanking = checkHandsRanking(side2Cards);
-      // console.log("side1cardsRanking", side1cardsRanking);
-      console.log("cardsRanking", cardsRanking);
-      let cardNames = GenerateCardsName(resultCards);
-      // let p2 = GenerateCardsName(side2Cards);
-      console.log("cardNames", cardNames);
-      // console.log("p2", p2);
-      var ranking = 5;
-     
+          mainGameCard.finalCards = cardsName;
+          // finalCards
+          adminAmount[0].amount += mainGameCard.total;
+          mainGameCard.winstatus = "You Loss";
+          flag = false;
+          console.log("flag3",flag);
+          break;
+        }
+      }
+
+      // // const side2cardsRanking = checkHandsRanking(side2Cards);
+      // // console.log("side1cardsRanking", side1cardsRanking);
+      // console.log("cardsRanking", cardsRanking);
+      // let cardNames = GenerateCardsName(resultCards);
+      // // let p2 = GenerateCardsName(side2Cards);
+      // console.log("cardNames", cardNames);
+      // // console.log("p2", p2);
+      // var ranking = 5;
+
       await mainGameCard.save();
+      await adminAmount[0].save();
       console.log("maincard", mainGameCard);
+      console.log("adminAmount-154", adminAmount);
       // })
     }
   } catch (error) {
