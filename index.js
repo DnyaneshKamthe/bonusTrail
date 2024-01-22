@@ -33,7 +33,7 @@ app.get("/", (req, res) => {
 });
 
 let timerState = {
-  duration: 30,
+  duration: 35,
   isRunning: false,
   stateFlag: true,
   baitFlag:true
@@ -50,21 +50,21 @@ function starttimer(){
       timerState.duration--;
       console.log(timerState.duration);
   
-      if (timerState.duration == 0 &&timerState.stateFlag == true ||timerState.duration <= 30 && timerState.duration >= 29 && timerState.stateFlag == true) {
+      if (timerState.duration == 0 &&timerState.stateFlag == true ||timerState.duration <= 35 && timerState.duration >= 33 && timerState.stateFlag == true) {
         MainGameIdGenerator();
         timerState.stateFlag = false;
       }
-      if (timerState.duration <= 12 && timerState.duration >= 11 &&timerState.stateFlag == false) {
+      if (timerState.duration <= 11 && timerState.duration >= 9 &&timerState.stateFlag == false) {
         gameCardHandler(cardID.cardID)
         timerState.stateFlag = true;
       }
-      if (timerState.duration <= 5 && timerState.duration >= 0 &&timerState.baitFlag == true) {
+      if (timerState.duration <=9 && timerState.duration >= 7 &&timerState.baitFlag == true) {
         baitWinHandler(cardID.cardID)
         timerState.baitFlag = false;
       }
       if (timerState.duration < 0) {
         // clearInterval(timerInterval);
-        timerState.duration = 30;
+        timerState.duration = 35;
         timerState.isRunning = false;
         timerState.baitFlag = true;
       }
