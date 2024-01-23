@@ -6,6 +6,7 @@ const BonusTrailCardSchema = new mongoose.Schema(
     total: { type: Number, default: 0 },
     finalCards: { type: Array },
     winstatus: { type: String },
+    winnerSet : { type : String },
   },
   {
     versionKey: false,
