@@ -95,7 +95,7 @@ const gameCardHandler = async (gameCardId) => {
       cardsRanking = checkHandsRanking(resultCards);
 
       let multiplyer = {
-        0:1,
+        0: 1,
         1: 2, //pair
         2: 4, //color
         3: 6, //sequence
