@@ -151,17 +151,17 @@ const gameCardHandler = async (gameCardId) => {
 
       const finalRank = checkHandsRanking( mainGameCard.finalCards);
 
-      if(finalRank == 0){
+      if(finalRank == 5){
         mainGameCard.winnerSet = "Trail"
-      }else if(finalRank == 1){
-        mainGameCard.winnerSet = "Pure Sequence"
-      }else if(finalRank == 2){
-        mainGameCard.winnerSet = "Sequence"
-      }else if(finalRank == 3){
-        mainGameCard.winnerSet = "Color"
       }else if(finalRank == 4){
+        mainGameCard.winnerSet = "Pure Sequence"
+      }else if(finalRank == 3){
+        mainGameCard.winnerSet = "Sequence"
+      }else if(finalRank == 2){
+        mainGameCard.winnerSet = "Color"
+      }else if(finalRank == 1){
         mainGameCard.winnerSet = "Pair"
-      }else{
+      }else if(finalRank == 0){
         mainGameCard.winnerSet = "High Cards"
       }
 
