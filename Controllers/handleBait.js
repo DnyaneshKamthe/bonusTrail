@@ -33,7 +33,7 @@ const handleBait = (userId, socket) => {
 
       socket.emit("userDetails", { user });
     } catch (error) {
-      console.log({ msg: "error in bait section", error: error.message });
+      console.log({ msg: "error in bait section", error: error });
     }
   });
 };
