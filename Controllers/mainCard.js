@@ -20,6 +20,7 @@ const cardID = { cardID: null };
 let deck = [];
 let flag = true;
 var resultCards = [];
+var cardsRanking = 5;
 
 const highCardsGenerator = (deck) => {
   // while(cardsRanking != 0){
@@ -75,7 +76,7 @@ const MainGameIdGenerator = async () => {
 const gameCardHandler = async (gameCardId) => {
   flag = true;
   console.log("flag1",flag);
-  var cardsRanking = 5;
+ 
   try {
     if (deck.length > 0) {
       const mainGameCard = await BonusTrailGameCard.findById(gameCardId);
@@ -147,6 +148,23 @@ const gameCardHandler = async (gameCardId) => {
       // console.log("cardNames", cardNames);
       // // console.log("p2", p2);
       // var ranking = 5;
+
+      const finalRank = checkHandsRanking( mainGameCard.finalCards);
+
+      if(finalRank == 0){
+        mainGameCard.winnerSet = "Trail"
+      }else if(finalRank == 1){
+        mainGameCard.winnerSet = "Pure Sequence"
+      }else if(finalRank == 2){
+        mainGameCard.winnerSet = "Sequence"
+      }else if(finalRank == 3){
+        mainGameCard.winnerSet = "Color"
+      }else if(finalRank == 4){
+        mainGameCard.winnerSet = "Pair"
+      }else{
+        mainGameCard.winnerSet = "High Cards"
+      }
+
 
       await mainGameCard.save();
       await adminAmount[0].save();
