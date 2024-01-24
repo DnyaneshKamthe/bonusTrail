@@ -149,19 +149,19 @@ const gameCardHandler = async (gameCardId) => {
       // // console.log("p2", p2);
       // var ranking = 5;
 
-      const finalRank = checkHandsRanking( mainGameCard.finalCards);
+      // const finalRank = checkHandsRanking(resultCards);
 
-      if(finalRank == 5){
+      if(cardsRanking == 5){
         mainGameCard.winnerSet = "Trail"
-      }else if(finalRank == 4){
+      }else if(cardsRanking == 4){
         mainGameCard.winnerSet = "Pure Sequence"
-      }else if(finalRank == 3){
+      }else if(cardsRanking == 3){
         mainGameCard.winnerSet = "Sequence"
-      }else if(finalRank == 2){
+      }else if(cardsRanking == 2){
         mainGameCard.winnerSet = "Color"
-      }else if(finalRank == 1){
+      }else if(cardsRanking == 1){
         mainGameCard.winnerSet = "Pair"
-      }else if(finalRank == 0){
+      }else if(cardsRanking == 0){
         mainGameCard.winnerSet = "High Cards"
       }
 
