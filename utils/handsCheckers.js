@@ -32,8 +32,20 @@ function isPair(cards) {
   );
 }
 
-function highCardGenerator(cards){
-  
-}
+const checkHandsRanking = (cards) => {
+  if (isTrail(cards)) {
+    return 5; // Trail
+  } else if (isPureSequence(cards)) {
+    return 4; // pure Sequence
+  } else if (isSequence(cards)) {
+    return 3; // Sequence
+  } else if (isColor(cards)) {
+    return 2; //color
+  } else if (isPair(cards)) {
+    return 1; // Pair
+  } else {
+    return 0; // High cards
+  }
+};
 
-module.exports={isTrail,isPureSequence,isSequence,isColor,isPair}
+module.exports={isTrail,isPureSequence,isSequence,isColor,isPair,checkHandsRanking}

@@ -48,7 +48,7 @@ function starttimer(){
     timerState.isRunning = true;
     timerInterval = setInterval(() => {
       timerState.duration--;
-      console.log(timerState.duration);
+      // console.log(timerState.duration);
   
       if (timerState.duration == 0 &&timerState.stateFlag == true ||timerState.duration <= 35 && timerState.duration >= 33 && timerState.stateFlag == true) {
         MainGameIdGenerator();

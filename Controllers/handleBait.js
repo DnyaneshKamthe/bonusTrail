@@ -3,12 +3,16 @@ const { BonusTrailGameCard } = require("../models/bonusTrail.maingame");
 
 const handleBait = (userId, socket) => {
   socket.on("bait", async (data) => {
-    const {  coins, cardId } = data;
+    const { coins, cardId } = data;
     // console.log("baitcardid",cardId);
     try {
       const user = await BonusTrailgameuser.findOne({ userId: userId });
       if (!user) {
         console.log({ msg: "user not found" });
+        return;
+      }
+      if (user.coins <= 0 || coins <= 0|| user.coins-coins<0) {
+        console.log({ msg: "insufficient balance" });
         return;
       }
 
@@ -24,9 +28,8 @@ const handleBait = (userId, socket) => {
       user.game_id = gameCard._id;
 
       user.coins = updatedCoins;
-     
 
-      gameCard.total += coins;
+      gameCard.total += parseInt(coins);
       await gameCard.save();
 
       await user.save();
@@ -51,15 +54,12 @@ const baitWinHandler = async (gameId) => {
       // Update the coins field in the user document
       await BonusTrailgameuser.updateOne(
         { _id: user._id },
-        { $set: { coins: updatedCoins,bait_status:"",baitCoins:0 } }
-      )
+        { $set: { coins: updatedCoins, bait_status: "", baitCoins: 0 } }
+      );
     }
-
   } catch (error) {
     console.log(error);
   }
 };
 
 module.exports = { handleBait, baitWinHandler };
-
-
