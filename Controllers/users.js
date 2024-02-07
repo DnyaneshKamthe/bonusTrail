@@ -10,12 +10,7 @@ const registerUser = async (userId, socket) => {
     if (!user) {
       throw new Error({ msg: "user not found" });
     }
-    if (user.coins <= 0) {
-         user.coins=10000
-      }
-     
-      await user.save();
-  
+ 
     socket.emit("userDetails", {
       user,
     });
