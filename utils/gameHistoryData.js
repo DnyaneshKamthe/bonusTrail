@@ -6,9 +6,8 @@ const gameHistoryData=async(winValue,historyArray)=>{
      GameHistoryData = new GameHistory({
       historyArray:[]
      });
-     // GameHistoryData.save()
     }
-    console.log(GameHistoryData[historyArray]);
+    // console.log(GameHistoryData[historyArray]);
    
     GameHistoryData[historyArray].push(winValue)
     GameHistoryData.save()

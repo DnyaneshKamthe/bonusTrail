@@ -1,5 +1,5 @@
 const { BonusTrailGameCard } = require("../models/bonusTrail.maingame");
-const { CardNameGenerator } = require("../utils/CardNameGenerator");
+const { GenerateCardsName } = require("../utils/CardNameGenerator");
 const { BonusTrailAdminAmount } = require("../models/bonusTrail.game.admin");
 const { checkHandsRanking } = require("../utils/handsCheckers");
 const {
@@ -8,7 +8,7 @@ const {
 } = require("../utils/randomNumberGenerators");
 const { shuffle } = require("../utils/shuffle");
 const { highCardsGenerator } = require("../utils/highCardsGenerator");
-const { bonusTrailGameHistory } = require("../Constants/constant");
+const { bonusTrailGameHistory, winStatusObj, handsName } = require("../Constants/constant");
 const { gameHistoryData } = require("../utils/gameHistoryData");
 
 const cardID = { cardID: null };
@@ -17,21 +17,6 @@ let flag = true;
 var resultCards = [];
 var cardsRanking = 5;
 
-// const highCardsGenerator = (deck) => {
-//   // while(cardsRanking != 0){
-//   resultCards = [];
-//   console.log("resultcards", resultCards);
-//   for (let i = 0; i < 3; i++) {
-//     const randomNum = randomDigitGenerator3();
-//     const drawcards = deck[randomNum];
-//     resultCards.push(drawcards);
-//   }
-//   console.log("deck", deck.length, resultCards);
-
-//   cardsRanking = checkHandsRanking(resultCards);
-//   return cardsRanking;
-//   // }
-// };
 
 const MainGameIdGenerator = async () => {
   const suits = ["hearts", "diamonds", "clubs", "spades"];
@@ -70,14 +55,12 @@ const MainGameIdGenerator = async () => {
 
 const gameCardHandler = async (gameCardId) => {
   flag = true;
-  console.log("flag1", flag);
 
   try {
     if (deck.length > 0) {
       const mainGameCard = await BonusTrailGameCard.findById(gameCardId);
 
       if (!mainGameCard) {
-        // socket.emit("gamecardError", { msg: "mainGame not Found" });
         console.log({ msg: "mainGame not found" });
       }
       resultCards = [];
@@ -86,7 +69,6 @@ const gameCardHandler = async (gameCardId) => {
         const drawcards = deck[randomNum];
         resultCards.push(drawcards);
       }
-      console.log("deck", deck.length, resultCards);
 
       cardsRanking = checkHandsRanking(resultCards);
 
@@ -100,8 +82,12 @@ const gameCardHandler = async (gameCardId) => {
       };
 
       //admin Amount
-      const adminAmount = await BonusTrailAdminAmount.find();
-      console.log("amount", adminAmount[0].amount);
+      let adminAmount = await BonusTrailAdminAmount.find();
+      if(adminAmount.length<=0){
+        adminAmount=await BonusTrailAdminAmount()
+        await adminAmount.save()
+      }
+     console.log(adminAmount);
 
       while (flag == true) {
         if (
@@ -112,7 +98,6 @@ const gameCardHandler = async (gameCardId) => {
           const { genCardsRanking, genResultCards } = highCardsGenerator(deck);
           cardsRanking = genCardsRanking;
           resultCards = [...genResultCards];
-          console.log("abeeeeeeeeeeeeeee baitada", genCardsRanking,genResultCards);
         } else if (
           adminAmount[0].amount >
           mainGameCard.total * multiplyer[cardsRanking]
@@ -122,13 +107,12 @@ const gameCardHandler = async (gameCardId) => {
           // finalCards
           if (cardsRanking > 0) {
             adminAmount[0].amount -= mainGameCard.total;
-            mainGameCard.winstatus = "You Win";
+            mainGameCard.winstatus = winStatusObj.YOU_WIN;
           } else if (cardsRanking <= 0) {
             adminAmount[0].amount += mainGameCard.total;
-            mainGameCard.winstatus = "You Loss";
+            mainGameCard.winstatus = winStatusObj.YOU_LOSS;
           }
           flag = false;
-          console.log("flag2", flag);
           break;
         } else {
           let cardsName = GenerateCardsName(resultCards);
@@ -137,65 +121,45 @@ const gameCardHandler = async (gameCardId) => {
           // finalCards
           if (cardsRanking > 0) {
             adminAmount[0].amount -= mainGameCard.total;
-            mainGameCard.winstatus = "You Win";
+            mainGameCard.winstatus = winStatusObj.YOU_WIN;
           } else if (cardsRanking <= 0) {
             adminAmount[0].amount += mainGameCard.total;
-            mainGameCard.winstatus = "You Loss";
+            mainGameCard.winstatus = winStatusObj.YOU_LOSS;
           }
     
           flag = false;
-          console.log("flag3", flag);
           break;
         }
       }
 
       if (cardsRanking == 5) {
-        mainGameCard.winnerSet = "Trail";
+        mainGameCard.winnerSet = handsName.TRAIL
       } else if (cardsRanking == 4) {
-        mainGameCard.winnerSet = "Pure Sequence";
+        mainGameCard.winnerSet = handsName.PURE_SEQUENCE;
       } else if (cardsRanking == 3) {
-        mainGameCard.winnerSet = "Sequence";
+        mainGameCard.winnerSet = handsName.SEQUENCE;
       } else if (cardsRanking == 2) {
-        mainGameCard.winnerSet = "Color";
+        mainGameCard.winnerSet = handsName.COLOR;
       } else if (cardsRanking == 1) {
-        mainGameCard.winnerSet = "Pair";
+        mainGameCard.winnerSet = handsName.PAIR;
       } else if (cardsRanking == 0) {
-        mainGameCard.winnerSet = "High Cards";
+        mainGameCard.winnerSet = handsName.HIGH_CARDS;
       }
 
       //game history logic
-      let winValue = mainGameCard.winstatus == "You Win" ? "UW" : "UL";
+      let winValue = mainGameCard.winstatus == winStatusObj.YOU_WIN ? "UW" : "UL";
       gameHistoryData(winValue, bonusTrailGameHistory);
 
       await mainGameCard.save();
       await adminAmount[0].save();
       console.log("maincard", mainGameCard);
-      console.log("adminAmount-154", adminAmount);
-      // })
     }
   } catch (error) {
     console.log({ msg: "error in gamehandlerfunction-", error: error });
   }
 };
 
-// const checkHandsRanking = (cards) => {
-//   if (isTrail(cards)) {
-//     return 5; // Trail
-//   } else if (isPureSequence(cards)) {
-//     return 4; // pure Sequence
-//   } else if (isSequence(cards)) {
-//     return 3; // Sequence
-//   } else if (isColor(cards)) {
-//     return 2; //color
-//   } else if (isPair(cards)) {
-//     return 1; // Pair
-//   } else {
-//     return 0; // High cards
-//   }
-// };
 
-const GenerateCardsName = (cards) => {
-  return cards.map((card) => CardNameGenerator(card));
-};
+
 
 module.exports = { MainGameIdGenerator, gameCardHandler, cardID };

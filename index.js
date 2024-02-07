@@ -10,7 +10,7 @@ const {
   MainGameIdGenerator,
   gameCardHandler,
 } = require("./Controllers/mainCard");
-const { handleBait, baitWinHandler } = require("./Controllers/handleBait");
+const { handlebet, betWinHandler } = require("./Controllers/handleBet");
 const { connection } = require("./config/db");
 
 const PORT = process.env.PORT || 5000;
@@ -36,7 +36,7 @@ let timerState = {
   duration: 35,
   isRunning: false,
   stateFlag: true,
-  baitFlag:true
+  betFlag:true
 };
 
 const sendMainCardData=async()=>{
@@ -58,15 +58,15 @@ function starttimer(){
         gameCardHandler(cardID.cardID)
         timerState.stateFlag = true;
       }
-      if (timerState.duration <=9 && timerState.duration >= 7 &&timerState.baitFlag == true) {
-        baitWinHandler(cardID.cardID)
-        timerState.baitFlag = false;
+      if (timerState.duration <=9 && timerState.duration >= 7 &&timerState.betFlag == true) {
+        betWinHandler(cardID.cardID)
+        timerState.betFlag = false;
       }
       if (timerState.duration < 0) {
         // clearInterval(timerInterval);
         timerState.duration = 35;
         timerState.isRunning = false;
-        timerState.baitFlag = true;
+        timerState.betFlag = true;
       }
   
       io.to("BonusTrailRoom").emit("gameUpdate", {gamestate: { value: timerState.duration }});
@@ -84,9 +84,9 @@ io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
   socket.join('BonusTrailRoom');
   registerUser(userId, socket);
-  handleBait(userId, socket);
+  handlebet(userId, socket);
   updatedUserAfterWin(userId,socket)
-  
+   
 
   socket.on("disconnect", () => {
     console.log("socket disconnected successfully");

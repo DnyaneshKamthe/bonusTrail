@@ -20,4 +20,8 @@ const CardNameGenerator = (card) => {
   return createCard;
 };
 
-module.exports={CardNameGenerator}
+const GenerateCardsName = (cards) => {
+  return cards.map((card) => CardNameGenerator(card));
+};
+
+module.exports={CardNameGenerator,GenerateCardsName}
