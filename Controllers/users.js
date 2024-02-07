@@ -8,7 +8,8 @@ const registerUser = async (userId, socket) => {
     const user = await UserMaster.findOne({_id:userId});
 
     if (!user) {
-      throw new Error({ msg: "user not found" });
+      // throw new Error({ msg: "user not found" });
+      console.log({ msg: "error in register user:- user not found" });
     }
  
     socket.emit("userDetails", {
