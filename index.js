@@ -81,7 +81,7 @@ function starttimer(){
 io.on("connection", (socket) => {
   console.log("socket connected successfully");
   // console.log(socket);
-  const userId = socket.handshake.query.userId;
+  const userId = socket.handshake.query.userID;
   socket.join('BonusTrailRoom');
   registerUser(userId, socket);
   handlebet(userId, socket);
