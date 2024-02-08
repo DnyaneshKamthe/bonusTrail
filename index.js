@@ -83,7 +83,9 @@ io.on("connection", (socket) => {
   // console.log(socket);
   const userId = socket.handshake.query.userID;
   socket.join('BonusTrailRoom');
-  registerUser(userId, socket);
+  if (userId) {
+    registerUser(userId, socket);
+  }
   handlebet(userId, socket);
   updatedUserAfterWin(userId,socket)
    
