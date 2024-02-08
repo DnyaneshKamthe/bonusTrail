@@ -11,7 +11,7 @@ const registerUser = async (userId, socket) => {
       // throw new Error({ msg: "user not found" });
       console.log({ msg: "error in register user:- user not found" });
     }
- 
+    user.save()
     socket.emit("userDetails", {
       user,
     });
