@@ -13,7 +13,7 @@ const handlebet = (userId, socket) => {
         return;
       }
       if (user.coins <= 0 || coins <= 0 || user.coins - coins < 0) {
-        console.log({ msg: "insufficient balance" });
+        socket.emit("noBet",{ msg: "Insufficient Balance" });
         return;
       }
 
