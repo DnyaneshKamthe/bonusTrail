@@ -12,6 +12,7 @@ const {
 } = require("./Controllers/mainCard");
 const { handlebet, betWinHandler } = require("./Controllers/handleBet");
 const { connection } = require("./config/db");
+const { GameHistory } = require("./models/gameHistory.model");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
