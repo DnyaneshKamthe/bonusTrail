@@ -53,7 +53,7 @@ const betWinHandler = async (gameId) => {
       "bonusTrailBet.bet_type": { $in: [BONUSTRAIL, null] },
     });
     for (const user of users) {
-      const updatedCoins = user.coins + user.bonusTrailBet.betCoins * 1.98;
+      const updatedCoins = (user.coins + user.bonusTrailBet.betCoins * 1.98).toFixed(2);
 
       // Update the coins field in the user document
       await UserMaster.updateOne(
