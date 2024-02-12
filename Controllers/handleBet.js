@@ -27,11 +27,11 @@ const handlebet = (userId, socket) => {
       user.bonusTrailBet.betCoins += parseInt(coins);
 
       let updatedCoins = user.coins - parseInt(coins);
+      user.coins = updatedCoins;
 
       // add main card id to user ref
       user.game_id = gameCard._id;
 
-      user.coins = updatedCoins;
 
       gameCard.total += parseInt(coins);
       await gameCard.save();
