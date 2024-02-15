@@ -1,4 +1,4 @@
-const { BONUSTRAIL } = require("../Constants/constant");
+const { BONUSTRAIL, winStatusObj } = require("../Constants/constant");
 const { UserMaster } = require("../models/bonusTrail.game");
 const { BonusTrailGameCard } = require("../models/bonusTrail.maingame");
 
@@ -13,7 +13,7 @@ const handlebet = (userId, socket) => {
         return;
       }
       if (user.coins <= 0 || coins <= 0 || user.coins - coins < 0) {
-        socket.emit("noBet",{ msg: "Insufficient Balance" });
+        socket.emit("noBet", { msg: "Insufficient Balance" });
         return;
       }
 
@@ -32,7 +32,6 @@ const handlebet = (userId, socket) => {
       // add main card id to user ref
       user.game_id = gameCard._id;
 
-
       gameCard.total += parseInt(coins);
       await gameCard.save();
 
@@ -47,25 +46,30 @@ const handlebet = (userId, socket) => {
 
 const betWinHandler = async (gameId) => {
   try {
-    // const gameCard = await BonusTrailGameCard.findById(gameId);
-    const users = await UserMaster.find({
-      game_id: gameId,
-      "bonusTrailBet.bet_type": { $in: [BONUSTRAIL, null] },
-    });
-    for (const user of users) {
-      const updatedCoins = (user.coins + user.bonusTrailBet.betCoins * 1.98).toFixed(2);
+    const gameCard = await BonusTrailGameCard.findById(gameId);
+    if (gameCard.winstatus == winStatusObj.YOU_WIN) {
+      const users = await UserMaster.find({
+        game_id: gameId,
+        "bonusTrailBet.bet_type": { $in: [BONUSTRAIL, null] },
+      });
+      for (const user of users) {
+        const updatedCoins = (
+          user.coins +
+          user.bonusTrailBet.betCoins * 1.98
+        ).toFixed(2);
 
-      // Update the coins field in the user document
-      await UserMaster.updateOne(
-        { _id: user._id },
-        {
-          $set: {
-            coins: updatedCoins,
-            "bonusTrailBet.bet_type": null,
-            "bonusTrailBet.betCoins": 0,
-          },
-        }
-      );
+        // Update the coins field in the user document
+        await UserMaster.updateOne(
+          { _id: user._id },
+          {
+            $set: {
+              coins: updatedCoins,
+              "bonusTrailBet.bet_type": null,
+              "bonusTrailBet.betCoins": 0,
+            },
+          }
+        );
+      }
     }
   } catch (error) {
     console.log(error);
