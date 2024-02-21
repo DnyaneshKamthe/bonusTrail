@@ -49,9 +49,11 @@ const sendMainCardData = async () => {
       },
     },
   ]);
+
+
   io.to("BonusTrailRoom").emit("Main_Card", {
     gameCard: main_card,
-    gameHistory: result[0].lastTenElements,
+    gameHistory: result[0]?.lastTenElements,
   });
 };
 function starttimer() {
@@ -59,7 +61,7 @@ function starttimer() {
     timerState.isRunning = true;
     setInterval(() => {
       timerState.duration--;
-      // console.log(timerState.duration);
+      console.log(timerState.duration);
 
       if (
         (timerState.duration == 0 && timerState.stateFlag == true) ||
@@ -79,8 +81,8 @@ function starttimer() {
         timerState.stateFlag = true;
       }
       if (
-        timerState.duration <= 9 &&
-        timerState.duration >= 7 &&
+        timerState.duration <= 8 &&
+        timerState.duration >= 6 &&
         timerState.betFlag == true
       ) {
         betWinHandler(cardID.cardID);

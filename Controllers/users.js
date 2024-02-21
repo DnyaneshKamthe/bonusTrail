@@ -1,6 +1,7 @@
 // userId,socket.id,socket
 
-const { UserMaster } = require("../models/bonusTrail.game");
+const { BonusTrailBet } = require("../models/bonusTrail.gameBet.model");
+const { UserMaster } = require("../models/bonusTrail.gameUser.model");
 
 // const {GameUser}
 const registerUser = async (userId, socket) => {
@@ -15,8 +16,19 @@ const registerUser = async (userId, socket) => {
     if (!user) {
       // throw new Error({ msg: "user not found" });
       console.log({ msg: "error in register user:- user not found" });
+      socket.emit("userNotFound",{msg:"User Not Found"})
+       return
     }
-    user.save()
+    let userbet=await BonusTrailBet.findOne({userId})
+    if(!userbet){
+      userbet=new BonusTrailBet({
+        userId:userId
+      })
+    }
+    await user.save()
+    await userbet.save()
+    console.log("dsfsd",userbet);
+
     socket.emit("userDetails", {
       user,
     });
