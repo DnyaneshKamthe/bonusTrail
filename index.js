@@ -51,7 +51,7 @@ const sendMainCardData = async () => {
   ]);
   io.to("BonusTrailRoom").emit("Main_Card", {
     gameCard: main_card,
-    gameHistory: result[0].lastTenElements,
+    gameHistory: result[0]?.lastTenElements,
   });
 };
 function starttimer() {
