@@ -6,7 +6,7 @@ const { BonusTrailGameCard } = require("../models/bonusTrail.maingame");
 const handlebet = (userId, socket) => {
   socket.on("bet", async (data) => {
     const { coins, cardId } = data;
-    console.log("betcardid", cardId);
+    // console.log("betcardid", cardId);
     try {
       const user = await UserMaster.findOne({ _id: userId });
       if (!user) {
@@ -65,15 +65,15 @@ const betWinHandler = async (gameId) => {
     const users = await BonusTrailBet.find({
       game_id: gameId,
       "bonusTrailBet.bet_type": { $in: [BONUSTRAIL, null] },
-    });
+    }).populate("userId");
 
-    // if (gameCard.winstatus == winStatusObj.YOU_WIN) {
-      for (const user of users) {
-        const updatedCoins = (
-          user.userId.coins +
-          user.bonusTrailBet.betCoins * 1.98
+    for (const user of users) {
+      const updatedCoins = (
+        user.userId.coins +
+        user.bonusTrailBet.betCoins * 1.98
         ).toFixed(2);
-
+        
+        if (gameCard.winstatus == winStatusObj.YOU_WIN) {
         // Update the coins field in the user document
         await UserMaster.updateOne(
           { _id: user.userId._id },
@@ -83,26 +83,13 @@ const betWinHandler = async (gameId) => {
             },
           }
         );
+        }
         user.bonusTrailBet.bet_type = null;
         user.bonusTrailBet.betCoins = 0;
 
         await user.save();
       }
-    // } 
-    // else {
-    //   for (const user of users) {
-    //     // Update the coins field in the user document
-    //     await UserMaster.updateOne(
-    //       { _id: user._id },
-    //       {
-    //         $set: {
-    //           "bonusTrailBet.bet_type": null,
-    //           "bonusTrailBet.betCoins": 0,
-    //         },
-    //       }
-    //     );
-    //   }
-    // }
+   
   } catch (error) {
     console.log(error);
   }
