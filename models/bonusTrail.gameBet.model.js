@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const gameBetSchema = new mongoose.Schema(
   {
 
-    coins: { type: Number },
     userId:{ type: mongoose.Schema.Types.ObjectId, ref: "UserMaster",default:null },
     game_id: { type: mongoose.Schema.Types.ObjectId, ref: "BonusTrailGameCard",default:null },
     bonusTrailBet:{
