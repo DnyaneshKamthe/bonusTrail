@@ -49,7 +49,7 @@ const handlebet = (userId, socket) => {
 
       await user.save();
       await userbet.save();
-      console.log("userjkdfdf", userbet);
+      // console.log("userjkdfdf", userbet);
 
       socket.emit("userDetails", { user });
     } catch (error) {
