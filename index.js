@@ -28,7 +28,6 @@ app.use(express.json());
 
 const io = socketIO(server);
 
-// let value = 30;
 app.get("/", (req, res) => {
   res.send("server is running");
 });
@@ -61,7 +60,6 @@ function starttimer() {
     timerState.isRunning = true;
     setInterval(() => {
       timerState.duration--;
-      console.log(timerState.duration);
 
       if (
         (timerState.duration == 0 && timerState.stateFlag == true) ||
@@ -97,9 +95,9 @@ function starttimer() {
       io.to("BonusTrailRoom").emit("gameUpdate", {
         gamestate: { value: timerState.duration },
       });
-      // if(cardID?.cardID){
+      if(cardID?.cardID){
       sendMainCardData();
-      // }
+      }
     }, 1000);
   }
 }
@@ -107,12 +105,9 @@ function starttimer() {
 const IOConnection = () => {
   io.on("connection", (socket) => {
     console.log("socket connected successfully");
-    // console.log(socket);
     const userId = socket.handshake.query.userID;
     socket.join("BonusTrailRoom");
-    // if (userId) {
     registerUser(userId, socket);
-    // }
     handlebet(userId, socket);
     updatedUserAfterWin(userId, socket);
 
@@ -133,13 +128,11 @@ function startGarbageCollectionTimer(interval) {
   return garbageCollectionTimer;
 }
 
-// Set the interval for garbage collection (e.g., every 5 minutes)
-const timer = startGarbageCollectionTimer(1000 * 60);
+startGarbageCollectionTimer(1000 * 60);
 
 server.listen(PORT, async () => {
   try {
     await connection.then(() => {
-      // dbFlag=true
       IOConnection();
       starttimer();
     });

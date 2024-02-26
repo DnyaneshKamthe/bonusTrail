@@ -6,7 +6,6 @@ const { BonusTrailGameCard } = require("../models/bonusTrail.maingame");
 const handlebet = (userId, socket) => {
   socket.on("bet", async (data) => {
     const { coins, cardId } = data;
-    // console.log("betcardid", cardId);
     try {
       const user = await UserMaster.findOne({ _id: userId });
       if (!user) {
@@ -49,7 +48,6 @@ const handlebet = (userId, socket) => {
 
       await user.save();
       await userbet.save();
-      // console.log("userjkdfdf", userbet);
 
       socket.emit("userDetails", { user });
     } catch (error) {

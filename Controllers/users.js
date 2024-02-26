@@ -3,31 +3,27 @@
 const { BonusTrailBet } = require("../models/bonusTrail.gameBet.model");
 const { UserMaster } = require("../models/bonusTrail.gameUser.model");
 
-// const {GameUser}
 const registerUser = async (userId, socket) => {
   try {
-    if(!userId){
+    if (!userId) {
       console.log({ msg: "error in register user:- userId not found" });
-      // callback("userId not found")
-      return
+      return;
     }
-    const user = await UserMaster.findOne({_id:userId});
+    const user = await UserMaster.findOne({ _id: userId });
 
     if (!user) {
-      // throw new Error({ msg: "user not found" });
       console.log({ msg: "error in register user:- user not found" });
-      socket.emit("userNotFound",{msg:"User Not Found"})
-       return
+      socket.emit("userNotFound", { msg: "User Not Found" });
+      return;
     }
-    let userbet=await BonusTrailBet.findOne({userId})
-    if(!userbet){
-      userbet=new BonusTrailBet({
-        userId:userId
-      })
+    let userbet = await BonusTrailBet.findOne({ userId });
+    if (!userbet) {
+      userbet = new BonusTrailBet({
+        userId: userId,
+      });
     }
-    await user.save()
-    await userbet.save()
-    console.log("dsfsd",userbet);
+    await user.save();
+    await userbet.save();
 
     socket.emit("userDetails", {
       user,
@@ -37,25 +33,26 @@ const registerUser = async (userId, socket) => {
   }
 };
 
-
-const updatedUserAfterWin =(userId,socket)=>{
-    socket.on("getUpdatedUserDetails",async()=>{
-      if(!userId){
-        console.log({msg:'user not found in updatedUserAfterWin'})
-        return
+const updatedUserAfterWin = (userId, socket) => {
+  socket.on("getUpdatedUserDetails", async () => {
+    try {
+      if (!userId) {
+        console.log({ msg: "user not found in updatedUserAfterWin" });
+        return;
       }
       let user = await UserMaster.findOne({ _id: userId });
-        if(!user){
-          console.log({msg:'user not found'})
-          return
-        }
+      if (!user) {
+        console.log({ msg: "user not found" });
+        return;
+      }
 
-        socket.emit("userDetails", {
-          user,
-        });
-    })
-}
+      socket.emit("userDetails", {
+        user,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  });
+};
 
-module.exports = { registerUser,updatedUserAfterWin };
-
-
+module.exports = { registerUser, updatedUserAfterWin };

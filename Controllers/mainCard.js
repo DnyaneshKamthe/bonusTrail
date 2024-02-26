@@ -87,7 +87,6 @@ const gameCardHandler = async (gameCardId) => {
         adminAmount=await BonusTrailAdminAmount()
         await adminAmount.save()
       }
-     console.log(adminAmount);
 
       while (flag == true) {
         if (
@@ -152,7 +151,6 @@ const gameCardHandler = async (gameCardId) => {
 
       await mainGameCard.save();
       await adminAmount[0].save();
-      console.log("maincard", mainGameCard);
     }
   } catch (error) {
     console.log({ msg: "error in gamehandlerfunction-", error: error });
