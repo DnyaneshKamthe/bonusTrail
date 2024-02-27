@@ -34,7 +34,6 @@ const handlebet = (userId, socket) => {
         });
       }
 
-      userbet.bonusTrailBet.bet_type = BONUSTRAIL;
       userbet.bonusTrailBet.betCoins += parseInt(coins);
 
       let updatedCoins = user.coins - parseInt(coins);
@@ -44,8 +43,8 @@ const handlebet = (userId, socket) => {
       userbet.game_id = gameCard._id;
 
       gameCard.total += parseInt(coins);
-      await gameCard.save();
 
+      await gameCard.save();
       await user.save();
       await userbet.save();
 
@@ -62,7 +61,6 @@ const betWinHandler = async (gameId) => {
 
     const users = await BonusTrailBet.find({
       game_id: gameId,
-      "bonusTrailBet.bet_type": { $in: [BONUSTRAIL, null] },
     }).populate("userId");
 
     for (const user of users) {
@@ -82,7 +80,6 @@ const betWinHandler = async (gameId) => {
           }
         );
         }
-        user.bonusTrailBet.bet_type = null;
         user.bonusTrailBet.betCoins = 0;
 
         await user.save();
