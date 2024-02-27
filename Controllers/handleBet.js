@@ -2,47 +2,69 @@ const { BONUSTRAIL, winStatusObj } = require("../Constants/constant");
 const { UserMaster } = require("../models/bonusTrail.game");
 const { BonusTrailGameCard } = require("../models/bonusTrail.maingame");
 
+
+// const addToBetQueue=(task)=> {
+//   betQueue.push(task);
+//   // console.log(betQueue);
+// }
+
+ const processBetQueue = async()=>{
+//    console.log(123);
+//    while (betQueue.length > 0) {
+//     const betTask = betQueue.shift(); 
+//     await betTask();
+//   }
+}
 const handlebet = (userId, socket) => {
-  socket.on("bet", async (data) => {
+  socket.on("bet",(data) => {
     const { coins, cardId } = data;
-    console.log("betcardid", cardId);
-    try {
-      const user = await UserMaster.findOne({ _id: userId });
-      if (!user) {
-        console.log({ msg: "user not found" });
-        return;
-      }
-      if (user.coins <= 0 || coins <= 0 || user.coins - coins < 0) {
-        socket.emit("noBet", { msg: "Insufficient Balance" });
-        return;
-      }
-
-      const gameCard = await BonusTrailGameCard.findById(cardId);
-      if (!gameCard) {
-        console.log({ msg: "maincard not found" });
-        return;
-      }
-
-      user.bonusTrailBet.bet_type = BONUSTRAIL;
-      user.bonusTrailBet.betCoins += parseInt(coins);
-
-      let updatedCoins = user.coins - parseInt(coins);
-      user.coins = updatedCoins;
-
-      // add main card id to user ref
-      user.game_id = gameCard._id;
-
-      gameCard.total += parseInt(coins);
-      await gameCard.save();
-
-      await user.save();
-
-      socket.emit("userDetails", { user });
-    } catch (error) {
-      console.log({ msg: "error in bet section", error: error });
-    }
+    betData.coins=coins;
+    console.log("betcardid", 1);
+    // addToBetQueue(async () => {
+    
   });
+  // console.log(betQueue);
+
+// })
 };
+
+const handleUserBetCoins=async(userId,cardId,coins,socket)=>{
+  try {
+    const user = await UserMaster.findOne({ _id: userId });
+    if (!user) {
+      console.log({ msg: "user not found" });
+      return;
+    }
+    if (user.coins <= 0 || coins <= 0 || user.coins - coins < 0) {
+      socket.emit("noBet", { msg: "Insufficient Balance" });
+      return;
+    }
+
+    const gameCard = await BonusTrailGameCard.findById(cardId);
+    if (!gameCard) {
+      console.log({ msg: "maincard not found" });
+      return;
+    }
+
+    user.bonusTrailBet.bet_type = BONUSTRAIL;
+    user.bonusTrailBet.betCoins += parseInt(coins);
+
+    let updatedCoins = user.coins - parseInt(coins);
+    user.coins = updatedCoins;
+
+    // add main card id to user ref
+    user.game_id = gameCard._id;
+
+    gameCard.total += parseInt(coins);
+    await gameCard.save();
+
+    await user.save();
+
+    socket.emit("userDetails", { user });
+  } catch (error) {
+    console.log({ msg: "error in bet section", error: error });
+  }
+}
 
 const betWinHandler = async (gameId) => {
   try {
@@ -88,5 +110,6 @@ const betWinHandler = async (gameId) => {
     console.log(error);
   }
 };
+ 
 
-module.exports = { handlebet, betWinHandler };
+module.exports = { handlebet, betWinHandler,processBetQueue,handleUserBetCoins };

@@ -10,7 +10,7 @@ const {
   MainGameIdGenerator,
   gameCardHandler,
 } = require("./Controllers/mainCard");
-const { handlebet, betWinHandler } = require("./Controllers/handleBet");
+const { handlebet, betWinHandler, processBetQueue, handleUserBetCoins } = require("./Controllers/handleBet");
 const { connection } = require("./config/db");
 const { GameHistory } = require("./models/gameHistory.model");
 
@@ -37,8 +37,11 @@ let timerState = {
   duration: 35,
   isRunning: false,
   stateFlag: true,
-  betFlag: true,
+  betWinFlag: true,
+  betFlag:true,
 };
+
+const betData = {coins:0};
 
 const sendMainCardData = async () => {
   let main_card = await BonusTrailGameCard.findById(cardID.cardID);
@@ -54,6 +57,8 @@ const sendMainCardData = async () => {
     gameHistory: result[0].lastTenElements,
   });
 };
+
+
 function starttimer() {
   if (!timerState.isRunning) {
     timerState.isRunning = true;
@@ -70,6 +75,14 @@ function starttimer() {
         MainGameIdGenerator();
         timerState.stateFlag = false;
       }
+      // if (
+      //   timerState.duration <= 14 &&
+      //   timerState.duration >= 12 &&
+      //   timerState.betFlag == true
+      // ){
+      //   handleUserBetCoins(userId,cardID.cardID,betData.coins)
+      //   timerState.betFlag = false
+      // }
       if (
         timerState.duration <= 11 &&
         timerState.duration >= 9 &&
@@ -81,17 +94,18 @@ function starttimer() {
       if (
         timerState.duration <= 9 &&
         timerState.duration >= 7 &&
-        timerState.betFlag == true
+        timerState.betWinFlag == true
       ) {
         betWinHandler(cardID.cardID);
-        timerState.betFlag = false;
+        timerState.betWinFlag = false;
       }
       if (timerState.duration < 0) {
-        timerState.duration = 35;
+        betData.coins=0;
         timerState.isRunning = false;
+        timerState.betWinFlag = true;
         timerState.betFlag = true;
+        timerState.duration = 35;
       }
-
       io.to("BonusTrailRoom").emit("gameUpdate", {
         gamestate: { value: timerState.duration },
       });
@@ -111,7 +125,13 @@ const IOConnection = () => {
     // if (userId) {
     registerUser(userId, socket);
     // }
-    handlebet(userId, socket);
+    // handlebet(userId, socket);
+    socket.on("bet",(data) => {
+      const { coins, cardId } = data;
+      betData.coins+=coins;      
+      console.log(betData);
+    });
+    
     updatedUserAfterWin(userId, socket);
 
     socket.on("disconnect", () => {
