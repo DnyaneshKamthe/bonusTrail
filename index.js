@@ -118,18 +118,6 @@ const IOConnection = () => {
   });
 };
 
-function startGarbageCollectionTimer(interval) {
-  const garbageCollectionTimer = setInterval(() => {
-    // Trigger garbage collection
-    global.gc();
-    console.log("Garbage collection triggered.");
-  }, interval);
-
-  return garbageCollectionTimer;
-}
-
-startGarbageCollectionTimer(1000 * 60);
-
 server.listen(PORT, async () => {
   try {
     await connection.then(() => {
